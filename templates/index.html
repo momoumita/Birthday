@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meowland</title>
+    <style>
+        /* Cartoonish Theme Variables */
+        :root {
+            --main-bg: #ffeaa7; 
+            --box-bg: #ffffff;
+            --border-color: #2d3436;
+            --accent-color: #74b9ff; 
+            --text-color: #2d3436;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', 'Chalkboard SE', 'Marker Felt', sans-serif;
+            background-color: var(--main-bg);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* CHANGED: Let the page grow and allow scrolling if it gets too tall! */
+            min-height: 100vh;
+            padding: 40px 0;
+            box-sizing: border-box;
+            margin: 0;
+            background-image: radial-gradient(circle, #fff3cd 10%, transparent 10%), radial-gradient(circle, #fff3cd 10%, transparent 10%);
+            background-size: 50px 50px;
+            background-position: 0 0, 25px 25px;
+        }
+
+        #app-container {
+            width: 90%;
+            max-width: 450px;
+            margin: auto;
+        }
+
+        .page-section {
+            background-color: var(--box-bg);
+            border: 5px solid var(--border-color);
+            border-radius: 20px;
+            padding: 40px 30px;
+            text-align: center;
+            box-shadow: 10px 10px 0px var(--border-color);
+        }
+
+        h1 {
+            font-size: 2.2em;
+            margin-top: 0;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+
+        .intro-text {
+            font-size: 1.2em;
+            margin-bottom: 25px;
+        }
+
+        .meow-dialogue {
+            background-color: #fab1a0; 
+            border: 3px dashed var(--border-color);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 25px;
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+
+        input[type="text"] {
+            width: 80%;
+            padding: 12px 15px;
+            font-size: 1.2em;
+            font-family: inherit;
+            border: 4px solid var(--border-color);
+            border-radius: 12px;
+            outline: none;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+
+        input[type="text"]:focus {
+            transform: scale(1.05);
+            border-color: #0984e3;
+        }
+
+        .action-btn {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 12px 30px;
+            font-size: 1.3em;
+            font-family: inherit;
+            font-weight: bold;
+            color: var(--border-color);
+            background-color: var(--accent-color);
+            border: 4px solid var(--border-color);
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 5px 5px 0px var(--border-color);
+            transition: all 0.1s ease-in-out;
+            width: 80%;
+        }
+
+        .action-btn:active {
+            transform: translate(5px, 5px);
+            box-shadow: 0px 0px 0px var(--border-color);
+        }
+
+        @keyframes popUp {
+            0% { transform: scale(0) translateY(50px); opacity: 0; }
+            60% { transform: scale(1.2) translateY(-20px); opacity: 1; }
+            100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
+
+        @keyframes floating {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .cat-image {
+            width: 180px; 
+            height: auto;
+            display: inline-block;
+            animation: popUp 0.7s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards, floating 3s ease-in-out infinite 0.7s;
+            filter: drop-shadow(6px 6px 0px var(--border-color));
+            margin-bottom: 20px;
+            margin-top: 10px;
+        }
+
+        .photo-gallery {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .polaroid {
+            width: 130px; 
+            height: 150px;
+            background-color: #fff;
+            border: 4px solid var(--border-color);
+            border-bottom-width: 25px; 
+            padding: 6px;
+            box-shadow: 6px 6px 0px var(--border-color);
+            border-radius: 6px;
+        }
+
+        .polaroid:nth-child(even) { transform: rotate(5deg); }
+        .polaroid:nth-child(odd) { transform: rotate(-5deg); }
+
+        .polaroid img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 2px solid var(--border-color);
+        }
+
+        .file-upload-slot {
+            font-family: inherit; 
+            font-size: 0.9em; 
+            border: 3px solid var(--border-color); 
+            padding: 8px; 
+            border-radius: 8px; 
+            background: #fff; 
+            cursor: pointer; 
+            width: 85%; 
+            margin-bottom: 8px; 
+            box-shadow: inset 3px 3px 0px #dfe6e9;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="app-container">
+        
+        <!-- PAGE 1: HOME PAGE -->
+        <div id="home-page" class="page-section" style="display: {% if friend_mode %}none{% else %}block{% endif %};">
+            <h1>Welcome to meowland!</h1>
+            <p class="intro-text">Before entering, let's know each other.</p>
+            <div class="meow-dialogue">
+                "Hello I am meow, and This is my land.<br>What's your name?"
+            </div>
+            <form onsubmit="goToNextPage(event)">
+                <input type="text" id="user-name-input" placeholder="Enter your name" required autocomplete="off">
+                <br>
+                <button type="submit" class="action-btn" style="width: auto; margin-top: 20px;">Enter</button>
+            </form>
+        </div>
+        
+        <!-- PAGE 2: THE CROSSROADS -->
+        <div id="second-page" class="page-section" style="display: none;">
+            <h1>Hey <span id="display-name" style="color: #0984e3; text-decoration: underline wavy #ff7675;">Friend</span>...</h1>
+            <p class="intro-text" style="font-weight: bold; margin-top: -10px;">Welcome! ✨</p>
+            
+            <div style="border: 3px solid var(--border-color); border-radius: 15px; padding: 15px; margin-bottom: 20px; box-shadow: 4px 4px 0px var(--border-color);">
+                <p class="intro-text" style="margin: 0;">Are you here to wish your friend? <br><strong>👇 Then click "Yes"</strong></p>
+                <button type="button" class="action-btn" style="background-color: #55efc4; margin-top: 15px;" onclick="goToUploadPage()">Yes!</button>
+            </div>
+
+            <div style="border: 3px solid var(--border-color); border-radius: 15px; padding: 15px; margin-bottom: 10px; box-shadow: 4px 4px 0px var(--border-color);">
+                <p class="intro-text" style="margin: 0;">Or did your friend invite you? <br><strong>👇 Then click "No"</strong></p>
+                <button type="button" class="action-btn" style="background-color: #ff7675; margin-top: 15px;" onclick="goToEntrancePage()">No!</button>
+            </div>
+        </div>
+
+        <!-- PAGE 2.5: THE "YES" BRANCH (Uploads) -->
+        <div id="upload-page" class="page-section" style="display: none;">
+            <h1>Hey <span id="display-name-upload" style="color: #0984e3; text-decoration: underline wavy #ff7675;">Friend</span>,</h1>
+            <div style="background-color: #ffeaa7; border: 3px dashed var(--border-color); border-radius: 15px; padding: 15px; margin-bottom: 20px;">
+                <p class="intro-text" style="margin: 0; font-weight: bold;">Upload exactly 4 pictures of your friend! 📸</p>
+            </div>
+            
+            <form action="/create_surprise" method="POST" enctype="multipart/form-data">
+                
+                <!-- CHANGED: Reduced to 4 upload slots -->
+                <div style="margin-bottom: 20px;">
+                    <input type="file" name="friend_pics" accept="image/*" required class="file-upload-slot">
+                    <input type="file" name="friend_pics" accept="image/*" required class="file-upload-slot">
+                    <input type="file" name="friend_pics" accept="image/*" required class="file-upload-slot">
+                    <input type="file" name="friend_pics" accept="image/*" required class="file-upload-slot">
+                </div>
+                
+                <textarea name="secret_message" placeholder="Type your secret message here..." required style="width: 85%; height: 80px; padding: 12px; font-size: 1.1em; font-family: inherit; border: 4px solid var(--border-color); border-radius: 12px; outline: none; resize: none; margin-bottom: 15px; box-shadow: inset 4px 4px 0px #dfe6e9;"></textarea>
+                <br>
+                <button type="submit" class="action-btn" style="background-color: #55efc4;">Generate Link!</button>
+            </form>
+        </div>
+
+        <!-- PAGE 3: THE ENTRANCE (Friend's View) -->
+        <div id="entrance-page" class="page-section" style="display: {% if friend_mode %}block{% else %}none{% endif %};">
+            
+            <h1>Hey <span style="color: #a29bfe; text-decoration: underline wavy #81ecec;">Friend</span>,</h1>
+            <h2 style="margin-top: -10px;">Welcome to my land! 🐾</h2>
+            
+            <img src="{{ url_for('static', filename='cat.gif') }}" alt="Animated Cartoon Cat" class="cat-image">
+
+            <p class="intro-text" style="font-weight: bold;">Now click here to enter my land.</p>
+            
+            <button type="button" class="action-btn" style="background-color: #a29bfe; font-size: 1.5em; padding: 15px 40px; border-radius: 50px; width: 90%; transform: rotate(1deg);" onclick="goToRevealPage()">Enter Land!</button>
+        </div>
+
+        <!-- PAGE 4: THE REVEAL -->
+        <div id="reveal-page" class="page-section" style="display: none;">
+            
+            <h1 style="color: #ff7675; font-size: 2.8em; margin-bottom: 10px;">Happy Birthday! 🎉</h1>
+            
+            <div class="photo-gallery">
+                {% if friend_mode and surprise_data %}
+                    {% for image in surprise_data.images %}
+                        <div class="polaroid">
+                            <img src="{{ url_for('static', filename='uploads/' + image) }}" alt="Friend Pic">
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="polaroid"><img src="https://via.placeholder.com/150/55efc4/2d3436?text=Pic+1" alt="Friend Pic 1"></div>
+                    <div class="polaroid"><img src="https://via.placeholder.com/150/74b9ff/2d3436?text=Pic+2" alt="Friend Pic 2"></div>
+                {% endif %}
+            </div>
+
+            <div style="background-color: #81ecec; border: 3px dashed var(--border-color); border-radius: 15px; padding: 15px; margin-bottom: 20px; box-shadow: 4px 4px 0px var(--border-color);">
+                <!-- CHANGED: Removed the "Look we got yo-" text, leaving just the secret message -->
+                <p class="intro-text" style="margin: 0; font-weight: bold; font-size: 1.1em;">
+                    <span style="color: #2d3436; font-style: italic;">
+                        {% if friend_mode and surprise_data %}
+                            {{ surprise_data.secret_message }}
+                        {% else %}
+                            [Backend will inject secret message here!]
+                        {% endif %}
+                    </span>
+                </p>
+            </div>
+
+            <button type="button" class="action-btn" style="background-color: #ff7675; width: 50%;" onclick="window.location.href='/'">Exit</button>
+
+        </div>
+
+    </div>
+
+    <!-- JavaScript to handle page swaps -->
+    <script>
+        function goToNextPage(event) {
+            event.preventDefault(); 
+            let nameTyped = document.getElementById('user-name-input').value;
+            
+            document.getElementById('display-name').innerText = nameTyped;
+            document.getElementById('display-name-upload').innerText = nameTyped;
+            
+            document.getElementById('home-page').style.display = 'none';
+            document.getElementById('second-page').style.display = 'block';
+        }
+
+        function goToUploadPage() {
+            document.getElementById('second-page').style.display = 'none';
+            document.getElementById('upload-page').style.display = 'block';
+        }
+
+        function goToEntrancePage() {
+            document.getElementById('second-page').style.display = 'none';
+            document.getElementById('entrance-page').style.display = 'block';
+            window.scrollTo(0,0); // Scrolls back to top on page swap
+        }
+
+        function goToRevealPage() {
+            document.getElementById('entrance-page').style.display = 'none';
+            document.getElementById('reveal-page').style.display = 'block';
+            window.scrollTo(0,0); // Scrolls back to top on page swap
+        }
+    </script>
+
+</body>
+</html>
